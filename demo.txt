@@ -1,0 +1,99 @@
+﻿#Input & Execution Start
+#JSON
+
+
+📥 Sample Input Payload:
+{
+  "customer_name": "Alice Wonder",
+  "email": "alice.w@example.com",
+  "query": "Hi, my Pro-Widget X is showing error code 42. I've tried restarting it but it didn't help. Can you assist?",
+  "priority": 4,
+  "ticket_id": "TKT-78901",
+  "log": []
+}
+
+
+
+
+
+
+#Execution Log
+
+
+🚀 Initiating Langie Support Agent...
+--------------------------------------------------
+📥 Sample Input Payload:
+{ ... }
+--------------------------------------------------
+✅ STAGE: INTAKE - Payload accepted.
+✅ STAGE: UNDERSTAND
+  📞 Calling COMMON Server: parse_request_text
+  📞 Calling ATLAS Server: extract_entities
+✅ STAGE: PREPARE
+  📞 Calling COMMON Server: normalize_fields
+  📞 Calling ATLAS Server: enrich_records
+  📞 Calling COMMON Server: add_flags_calculations
+✅ STAGE: RETRIEVE
+  📞 Calling ATLAS Server: knowledge_base_search
+✅ STAGE: DECIDE
+  📞 Calling COMMON Server: solution_evaluation
+  🧠 Decision Logic: Score is 95. Sufficient solution found. Proceed to create response.
+  🚦 Routing based on decision...
+  🚦 -> Path: CREATE
+✅ STAGE: CREATE
+  📞 Calling COMMON Server: response_generation
+✅ STAGE: DO
+  📞 Calling ATLAS Server: trigger_notifications
+  🚦 Routing after DO...
+  🚦 -> Path: CLOSE
+✅ STAGE: CLOSE
+  📞 Calling ATLAS Server: close_ticket
+✅ STAGE: COMPLETE - Workflow finished.
+
+
+Final Structured Payload Output:
+{
+  "customer_name": "Alice Wonder",
+  "email": "alice.w@example.com",
+  "query": "Hi, my Pro-Widget X is showing error code 42. I've tried restarting it but it didn't help. Can you assist?",
+  "priority": 4,
+  "ticket_id": "TKT-78901",
+  "log": [
+    "✅ STAGE: INTAKE - Payload accepted.",
+    "✅ STAGE: UNDERSTAND",
+    "✅ STAGE: PREPARE",
+    "✅ STAGE: RETRIEVE",
+    "✅ STAGE: DECIDE",
+    "  Decision Logic: Score is 95. Sufficient solution found. Proceed to create response.",
+    "✅ STAGE: CREATE",
+    "✅ STAGE: DO",
+    "✅ STAGE: CLOSE",
+    "✅ STAGE: COMPLETE - Workflow finished."
+  ],
+  "structured_data": {
+    "intent": "technical_support",
+    "structured_query": "Hi, my Pro-Widget X is showing error code 42. I've tried restarting it but it didn't help. Can you assist?",
+    "extracted_entities": [
+      "Pro-Widget X",
+      "error code 42"
+    ]
+  },
+  "enriched_data": {
+    "normalized_ticket_id": "TKT-78901",
+    "customer_sla": "Gold",
+    "historical_ticket_count": 5,
+    "is_urgent_flag": False,
+    "calculated_priority": 4
+  },
+  "retrieved_kb_article": {
+    "id": "KB-123",
+    "title": "Resolving Error Code 42 on Pro-Widget X",
+    "summary": "This error is typically caused by a firmware mismatch. To resolve, please follow the steps to update the firmware..."
+  },
+  "decision": {
+    "score": 95,
+    "outcome": "CREATE_RESPONSE"
+  },
+  "final_response": "Hello Alice Wonder,\n\nThank you for contacting us about your query: 'Hi, my Pro-Widget X is showi...'.\n\nBased on our knowledge base, here is a relevant article that might help: 'Resolving Error Code 42 on Pro-Widget X'.\n\nSummary: This error is typically caused by a firmware mismatch. To resolve, please follow the steps to update the firmware...\n\nRegards,\nLangie Support Agent",
+  "final_status": "RESOLVED"
+}
