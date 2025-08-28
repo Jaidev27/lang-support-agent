@@ -1,0 +1,103 @@
+
+agent_name: Langie_Support_Agent
+version: 1.0
+description: Models a customer support workflow using a Lang Graph architecture.
+
+input_schema:
+  description: "The initial payload received by the INTAKE stage."
+  properties:
+    customer_name: { type: string, example: "Alice Wonder" }
+    email: { type: string, example: "alice.w@example.com" }
+    query: { type: string, example: "Hi, my Pro-Widget X is showing error code 42. I've tried restarting it but it didn't help. Can you assist?" }
+    priority: { type: integer, example: 2 }
+    ticket_id: { type: string, example: "TKT-78901" }
+
+stages:
+  - name: INTAKE
+    mode: deterministic
+    description: "Accepts the initial customer payload."
+    abilities:
+      - accept_payload
+
+  - name: UNDERSTAND
+    mode: deterministic
+    description: "Parses the request and extracts key information."
+    prompt_logic: "Execute abilities in sequence to structure the query."
+    abilities:
+      - name: parse_request_text
+        server: COMMON
+      - name: extract_entities
+        server: ATLAS
+
+  - name: PREPARE
+    mode: deterministic
+    description: "Cleans and enriches the data for processing."
+    prompt_logic: "Execute abilities in sequence to prepare the record."
+    abilities:
+      - name: normalize_fields
+        server: COMMON
+      - name: enrich_records
+        server: ATLAS
+      - name: add_flags_calculations
+        server: COMMON
+
+  - name: RETRIEVE
+    mode: deterministic
+    description: "Searches the knowledge base for potential solutions."
+    prompt_logic: "Find relevant articles from the knowledge base."
+    abilities:
+      - name: knowledge_base_search
+        server: ATLAS
+
+  - name: DECIDE
+    mode: non-deterministic
+    description: "Evaluates solutions and decides the next step."
+    prompt_logic: "Score the retrieved solution. If score < 90, escalate to a human. Otherwise, generate a response."
+    abilities:
+      - name: solution_evaluation
+        server: COMMON
+      - name: escalation_decision
+        server: ATLAS
+
+  - name: CREATE
+    mode: deterministic
+    description: "Generates the response for the customer."
+    prompt_logic: "Draft a helpful reply based on the knowledge base article."
+    abilities:
+      - name: response_generation
+        server: COMMON
+
+  - name: UPDATE
+    mode: deterministic
+    description: "Updates the ticket, typically for escalation."
+    prompt_logic: "Update the ticket status to 'Escalated' and assign to a human agent."
+    abilities:
+      - name: update_ticket
+        server: ATLAS
+
+  - name: DO
+    mode: deterministic
+    description: "Executes final API calls and sends notifications."
+    prompt_logic: "Trigger notifications to the customer."
+    abilities:
+      - name: execute_api_calls
+        server: ATLAS
+      - name: trigger_notifications
+        server: ATLAS
+        
+  - name: CLOSE
+    mode: deterministic
+    description: "Closes the ticket after resolution."
+    prompt_logic: "Mark the ticket as resolved."
+    abilities:
+      - name: close_ticket
+        server: ATLAS
+
+  - name: COMPLETE
+    mode: deterministic
+    description: "Outputs the final, structured payload."
+    abilities:
+      - output_payload
+
+
+# They would be part of a more complex, interactive graph branching logic.
